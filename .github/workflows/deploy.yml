@@ -10,9 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy Docker Container to EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/your-key.pem ubuntu@your-ec2-ip << 'EOF'
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
             docker rm -f system-monitor || true
             docker run -d --name system-monitor -p 80:5000 stealthcoderx/system-monitor:latest
-          EOF
